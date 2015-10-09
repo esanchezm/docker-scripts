@@ -68,6 +68,7 @@ To create a temporary port forward via SSH, use:
     docker_machine_start
     docker_machine_status
     docker_machine_stop
+    docker_machine_unalias
     docker_machine_upgrade
   
 -------------------------

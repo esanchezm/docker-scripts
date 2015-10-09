@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-export DOCKER_BIN=$(which docker)
 export DOCKER_MACHINE_NAME="default" # for kitematic compatibility
 
 DOCKER_MACHINE_CPUS=4
@@ -85,10 +84,16 @@ docker_machine_ensure() {
     && docker_machine_eval_config
 }
 
+docker_machine_unalias() {
+    unalias docker || true
+    unalias docker-compose || true
+}
+
 docker_machine_alias() {
     docker_machine_isrunning
     if [ $? -ne 0 ]; then
-        alias docker="docker_machine_ensure && unset docker && ${DOCKER_BIN} $@"
+        alias docker="docker_machine_ensure && docker_machine_unalias && docker $@"
+        alias docker-compose="docker_machine_ensure && docker_machine_unalias && docker-compose $@"
     else
         docker_machine_eval_config
     fi
