@@ -1,5 +1,19 @@
 #Scripts/functions to make life easier with Docker
   
+##General helper functions:
+  
+To source them, run:
+  
+    source helpers.sh
+  
+###Functions this exposes:
+  
+    docker_delete_stopped
+    docker_delete_dead
+    docker_delete_dangling_images
+  
+--------
+  
 ##OSX docker-machine users:
   
 _Note: assumes you're using bash, not ZSH, and already have
