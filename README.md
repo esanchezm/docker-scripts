@@ -27,6 +27,15 @@ change the following variables in the script:
     DOCKER_MACHINE_MEMORY=2048
     DOCKER_MACHINE_DRIVER="virtualbox"
   
+###Forwarding ports
+To create a perament (until machine is destroyed) port forward, use:
+  
+    docker_machine_forward_port_vbox <port> [tcp|udp]
+  
+To create a temporary port forward via SSH, use:
+  
+    docker_machine_forward_port_ssh <port>
+  
 ###Function names the script will expose if you want to run them manually:
 
     docker_machine_alias
@@ -37,6 +46,8 @@ change the following variables in the script:
     docker_machine_errored
     docker_machine_eval_config
     docker_machine_exists
+    docker_machine_forward_port_ssh
+    docker_machine_forward_port_vbox
     docker_machine_isrunning
     docker_machine_recreate
     docker_machine_restart

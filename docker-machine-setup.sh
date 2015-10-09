@@ -94,4 +94,54 @@ docker_machine_alias() {
     fi
 }
 
+docker_machine_forward_port_vbox() {
+    docker_machine_exists
+    if [ $? -ne 0 ]; then
+        echo "You haven't created a docker-machine VM yet" >&2
+        return 1
+    fi
+
+    if [ -z $1 ]; then
+        echo "Usage: $0 port [tcp|udp]" >&2
+        return 1
+    fi
+
+    local port=$1
+    local proto="tcp"
+
+    if [ ! -z $2 ]; then
+        proto=$2
+    fi
+
+    local subcommand="modifyvm"
+    if (docker_machine_isrunning); then
+        subcommand="controlvm"
+    fi
+
+    VboxManage ${subcommand} "${DOCKER_MACHINE_NAME}" natpf1 \
+        "user-defined-port${port},${proto},,${port},,${port}"
+}
+
+docker_machine_forward_port_ssh() {
+    docker_machine_isrunning
+    if [ $? -ne 0 ]; then
+        echo "Your docker-machine VM isn't running" >&2
+        return 1
+    fi
+
+    if [ -z $1 ]; then
+        echo "Usage: $0" >&2
+        return 1
+    fi
+
+    local port=$1
+
+    ssh -o StrictHostKeyChecking=no \
+        -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa \
+        -f \
+        -L ${port}:localhost:${port} \
+        docker@$(docker-machine ip ${DOCKER_MACHINE_NAME}) \
+        -N
+}
+
 docker_machine_alias
