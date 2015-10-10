@@ -85,15 +85,15 @@ docker_machine_ensure() {
 }
 
 docker_machine_unalias() {
-    unalias docker || true
-    unalias docker-compose || true
+    unset docker || true
+    unset "docker-compose" || true
 }
 
 docker_machine_alias() {
     docker_machine_isrunning
     if [ $? -ne 0 ]; then
         alias docker="docker_machine_ensure && docker_machine_unalias && docker $@"
-        alias docker-compose="docker_machine_ensure && docker_machine_unalias && docker-compose $@"
+        alias "docker-compose"="docker_machine_ensure && docker_machine_unalias && docker-compose $@"
     else
         docker_machine_eval_config
     fi
