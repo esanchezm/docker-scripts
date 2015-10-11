@@ -4,7 +4,7 @@ export DOCKER_MACHINE_NAME="default" # for kitematic compatibility
 
 DOCKER_MACHINE_CPUS=4
 DOCKER_MACHINE_DISK_SIZE=40000
-DOCKER_MACHINE_MEMORY=2048
+DOCKER_MACHINE_MEMORY=4096
 DOCKER_MACHINE_DRIVER="virtualbox"
 
 docker_machine_ensure_created() {
