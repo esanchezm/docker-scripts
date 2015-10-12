@@ -11,6 +11,7 @@ To source them, run:
     docker_delete_stopped
     docker_delete_dead
     docker_delete_dangling_images
+    docker_stats_running
   
 --------
   

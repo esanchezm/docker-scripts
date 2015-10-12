@@ -9,3 +9,7 @@ docker_delete_dead() {
 docker_delete_dangling_images() {
     docker images -q -f dangling=true | xargs docker rmi
 }
+
+docker_stats_running() {
+    docker stats $(docker ps --format "{{ .Names }}" | sort)
+}
