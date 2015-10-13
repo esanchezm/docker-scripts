@@ -1,15 +1,66 @@
 #!/usr/bin/env bash
 
-export DOCKER_MACHINE_NAME="default" # for kitematic compatibility
+docker_machine_load_defaults() {
+    if [ -z $DOCKER_MACHINE_NAME ]; then
+        # "default" for kitematic compatibility
+        export DOCKER_MACHINE_NAME="default"
+    fi
+    if [ -z $DOCKER_MACHINE_CPUS ]; then
+        docker_machine_set_cpus 1
+    fi
+    if [ -z $DOCKER_MACHINE_DISK_SIZE ]; then
+        docker_machine_set_disk_size 20000
+    fi
+    if [ -z $DOCKER_MACHINE_MEMORY ]; then
+        docker_machine_set_memory 2096
+    fi
+    if [ -z $DOCKER_MACHINE_DRIVER ]; then
+        docker_machine_set_driver "virtualbox"
+    fi
+}
 
-DOCKER_MACHINE_CPUS=4
-DOCKER_MACHINE_DISK_SIZE=40000
-DOCKER_MACHINE_MEMORY=4096
-DOCKER_MACHINE_DRIVER="virtualbox"
+docker_machine_set_name() {
+    if [ -z $1 ]; then
+        echo "Missing machine name to use" >&2
+        return 1
+    fi
+    export DOCKER_MACHINE_NAME=$1
+}
+
+docker_machine_set_cpus() {
+    if [ -z $1 ]; then
+        echo "Missing cpu count" >&2
+        return 1
+    fi
+    export DOCKER_MACHINE_CPUS=$1
+}
+
+docker_machine_set_disk_size() {
+    if [ -z $1 ]; then
+        echo "Missing disk size" >&2
+    fi
+    export DOCKER_MACHINE_DISK_SIZE=$1
+}
+
+docker_machine_set_memory() {
+    if [ -z $1 ]; then
+        echo "Missing memory value" >&2
+        return 1
+    fi
+    export DOCKER_MACHINE_MEMORY=$1
+}
+
+docker_machine_set_driver() {
+    if [ -z $1 ]; then
+        echo "Missing driver value" >&2
+        return 1
+    fi
+    export DOCKER_MACHINE_DRIVER=$1
+}
 
 docker_machine_ensure_created() {
     docker_machine_errored && docker_machine_destroy
-    docker-machine ls | grep -v Error | grep ${DOCKER_MACHINE_NAME} >> /dev/null
+    docker_machine_exists
     if [ $? -ne 0 ]; then
         docker-machine create -d ${DOCKER_MACHINE_DRIVER} \
             --virtualbox-cpu-count "${DOCKER_MACHINE_CPUS}" \
@@ -20,7 +71,7 @@ docker_machine_ensure_created() {
 }
 
 docker_machine_errored() {
-    docker-machine ls 2> /dev/null | grep Error | grep ${DOCKER_MACHINE_NAME} >> /dev/null 2>/dev/null
+    docker-machine ls --filter state=Error 2> /dev/null | grep "^${DOCKER_MACHINE_NAME} " >> /dev/null 2>/dev/null
     return $?
 }
 
@@ -29,7 +80,7 @@ docker_machine_upgrade() {
 }
 
 docker_machine_exists() {
-    docker-machine ls | grep ${DOCKER_MACHINE_NAME} >> /dev/null
+    docker-machine ls | grep "^${DOCKER_MACHINE_NAME} " >> /dev/null
     return $?
 }
 
@@ -58,9 +109,11 @@ docker_machine_isrunning() {
 }
 
 docker_machine_ensure_running() {
-    docker_machine_isrunning
-    if [ $? -ne 0 ]; then
-        docker_machine_start
+    docker_machine_exists
+    if [ $? -eq 0 ]; then
+        docker_machine_isrunning || docker_machine_start
+    else
+        echo "Docker machine ${DOCKER_MACHINE_NAME} does not exist" >&2
     fi
 }
 
@@ -85,8 +138,8 @@ docker_machine_ensure() {
 }
 
 docker_machine_unalias() {
-    unset docker || true
-    unset "docker-compose" || true
+    unalias docker
+    unalias "docker-compose"
 }
 
 docker_machine_alias() {
@@ -149,4 +202,5 @@ docker_machine_forward_port_ssh() {
         -N
 }
 
+docker_machine_load_defaults
 docker_machine_alias

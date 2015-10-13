@@ -34,7 +34,10 @@ You can now use the docker command without fiddling with docker-machine setup.
 Docker Machine machine name: 'default' (for Kitematic Compatibility)  
   
 To change the machine's name, number of cpus, memory, disk size, or driver,
-change the following variables in the script:
+use the docker_machine_set_* functions to change your values.  
+  
+Alternatively, you can change the following variables either by exporting
+before sourcing, or directly in the script:
 
     export DOCKER_MACHINE_NAME="default" # for kitematic compatibility
     DOCKER_MACHINE_CPUS=4
@@ -64,8 +67,14 @@ To create a temporary port forward via SSH, use:
     docker_machine_forward_port_ssh
     docker_machine_forward_port_vbox
     docker_machine_isrunning
+    docker_machine_load_defaults
     docker_machine_recreate
     docker_machine_restart
+    docker_machine_set_cpus
+    docker_machine_set_disk_size
+    docker_machine_set_driver
+    docker_machine_set_name
+    docker_machine_set_memory
     docker_machine_start
     docker_machine_status
     docker_machine_stop
